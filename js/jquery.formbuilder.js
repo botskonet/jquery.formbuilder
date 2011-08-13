@@ -402,30 +402,30 @@
 			// handle field display/hide
 			$('.toggle-form').live('click', function () {
 				var target = $(this).attr("id");
-				if ($(this).html() === opts.messages.hide) {
+				if ($(this).children('.ui-button-text').html() === opts.messages.hide) {
 					$(this).removeClass('open')
 							.addClass('closed')
-							.html(opts.messages.show)
 							.button({
 								icons: {
 									primary: 'ui-icon-triangle-1-s'
 								}
 							});
+					$(this).children('.ui-button-text').html(opts.messages.show);
 					$('#' + target + '-fld').animate({
 						opacity: 'hide',
 						height: 'hide'
 					}, 'slow');
 					return false;
 				}
-				if ($(this).html() === opts.messages.show) {
+				if ($(this).children('.ui-button-text').html() === opts.messages.show) {
 					$(this).removeClass('closed')
 							.addClass('open')
-							.html(opts.messages.hide)
 							.button({
 								icons: {
 									primary: 'ui-icon-triangle-1-n'
 								}
 							});
+					$(this).children('.ui-button-text').html(opts.messages.hide);
 					$('#' + target + '-fld').animate({
 						opacity: 'show',
 						height: 'show'
