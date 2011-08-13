@@ -363,6 +363,30 @@
 						height: 'show'
 					}, 'slow');
 					last_id++;
+					$('.del-button').button({
+						icons: {
+							primary: 'ui-icon-trash'
+						},
+						text: false
+					});
+					$('.toggle-form').button({
+						icons: {
+							primary: 'ui-icon-triangle-1-n'
+						},
+						text: false
+					});
+					$('.add').button({
+						icons: {
+							primary: 'ui-icon-plus'
+						},
+						text: false
+					});
+					$('.remove').button({
+						icons: {
+							primary: 'ui-icon-trash'
+						},
+						text: false
+					});
 				};
 			// handle field delete links
 			$('.remove').live('click', function () {
@@ -379,7 +403,14 @@
 			$('.toggle-form').live('click', function () {
 				var target = $(this).attr("id");
 				if ($(this).html() === opts.messages.hide) {
-					$(this).removeClass('open').addClass('closed').html(opts.messages.show);
+					$(this).removeClass('open')
+							.addClass('closed')
+							.html(opts.messages.show)
+							.button({
+								icons: {
+									primary: 'ui-icon-triangle-1-s'
+								}
+							});
 					$('#' + target + '-fld').animate({
 						opacity: 'hide',
 						height: 'hide'
@@ -387,7 +418,14 @@
 					return false;
 				}
 				if ($(this).html() === opts.messages.show) {
-					$(this).removeClass('closed').addClass('open').html(opts.messages.hide);
+					$(this).removeClass('closed')
+							.addClass('open')
+							.html(opts.messages.hide)
+							.button({
+								icons: {
+									primary: 'ui-icon-triangle-1-n'
+								}
+							});
 					$('#' + target + '-fld').animate({
 						opacity: 'show',
 						height: 'show'
