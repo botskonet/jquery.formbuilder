@@ -48,6 +48,18 @@ class Formbuilder {
 	 * @access protected
 	 */
 	protected $_structure_ser;
+	
+	/**
+	 * @var array Holds the data in raw array form
+	 * @access protected
+	 */
+	protected $_data;
+
+	/**
+	 * @var array Holds the data in serialized form
+	 * @access protected
+	 */
+	protected $_data_ser;
 
 	/**
 	 * @var array Holds the hash of the serialized form
@@ -72,7 +84,9 @@ class Formbuilder {
 			$this->_container = $form; // set the form as the container
 			$this->_structure_ser = $form['form_structure']; // pull the serialized form
 			$this->_hash = $this->hash(); // hash the current structure
-			$this->_structure = $this->retrieve(); // unserialize the form as the raw structure
+			$this->_structure = $this->retrieve_structure(); // unserialize the form as the raw structure
+			$this->_data_ser = $form['form_data']; // pull the serialized data
+			$this->_data = $this->retrieve_data(); // unserialize the data
 			
 		} else {
 
@@ -137,10 +151,27 @@ class Formbuilder {
 	 * @access public
 	 * @return boolean
 	 */
-	public function retrieve(){
+	public function retrieve_structure(){
 		if(is_array($this->_container) && array_key_exists('form_hash', $this->_container)){
 		 	if($this->_container['form_hash'] == $this->hash($this->_container['form_structure'])){
 				return unserialize($this->_container['form_structure']);
+		  }
+		}
+		return false;
+	}
+	
+	/**
+	 * Returns a serialized data back into it's original array, for use
+	 * with rendering.
+	 *
+	 * @param string $form_array
+	 * @access public
+	 * @return boolean
+	 */
+	public function retrieve_data(){
+		if(is_array($this->_container) && array_key_exists('form_hash', $this->_container)){
+		 	if($this->_container['form_hash'] == $this->hash($this->_container['form_structure'])){
+				return unserialize($this->_container['form_data']);
 		  }
 		}
 		return false;
@@ -379,6 +410,9 @@ class Formbuilder {
 		}
 
 		$success = empty($error);
+		
+		//$test = serialize($results);
+		//echo $test;
 
 		// if results is array, send email
 		return array('success'=>$success,'results'=>$results,'errors'=>$error);
@@ -437,6 +471,8 @@ class Formbuilder {
 	protected function loadInputText($field){
 
 		$field['required'] = $field['required'] == 'checked' ? ' required' : false;
+		
+		$field_value = ( $this->getDataValue($field['code']) ? $this->getDataValue($field['code']) : $this->getPostValue($field['code']) );
 
 		$html = '';
 		$html .= sprintf('<li class="%s%s" id="fld-%s">' . "\n", $this->elemId($field['cssClass']), $field['required'], $field['code']);
@@ -444,7 +480,7 @@ class Formbuilder {
 		$html .= sprintf('<input type="text" id="%s" name="%s" value="%s" />' . "\n",
 								$field['code'],
 								$field['code'],
-								$this->getPostValue($field['code']));
+								$field_value);
 		$html .= '</li>' . "\n";
 
 		return $html;
@@ -504,7 +540,7 @@ class Formbuilder {
 				$checked = $item['default'] == 'true' ? true : false;
 
 				// load post value
-				$val = $this->getPostValue($field['code'].'-'.$i);
+				$val = ( $this->getDataValue($field['code'].'-'.$i) ? $this->getDataValue($field['code'].'-'.$i) : $this->getPostValue($field['code'].'-'.$i) );
 				$checked = !empty($val);
 
 				// if checked, set html
@@ -549,15 +585,15 @@ class Formbuilder {
 			foreach($field['values'] as $item){
 
 				// set the default checked value
-				$checked = $item['default'] == 'true' ? true : false;
+				$checked = $item['baseline'] == 'checked' ? true : false;
 
 				// load post value
-				$val = $this->getPostValue($field['code']);
-				$checked = !empty($val);
+				$val = ( $this->getDataValue($field['code']) && $this->getDataValue($field['code']) == $item['value'] ? $this->getDataValue($field['code']) : $this->getPostValue($field['code']) );
+				$checked = ! empty($val) ? true : false;
 
 				// if checked, set html
 				$checked = $checked ? ' checked="checked"' : '';
-				
+			
 				$radio 		= '<span class="row clearfix"><input type="radio" id="%s-'.$i.'" name="%1$s" value="%s"%s /><label for="%1$s-'.$i.'">%2$s</label></span>' . "\n";
 				$html .= sprintf($radio,
 										$field['code'],
@@ -602,14 +638,14 @@ class Formbuilder {
 			foreach($field['values'] as $item){
 
 				// set the default checked value
-				$checked = $item['default'] == 'true' ? true : false;
+				$checked = $item['baseline'] == 'checked' ? true : false;
 
 				// load post value
-				$val = $this->getPostValue($field['code']);
-				$checked = !empty($val);
+				$val = ( $this->getDataValue($field['code']) && $this->getDataValue($field['code']) == $item['value'] ? $this->getDataValue($field['code']) : $this->getPostValue($field['code']) );
+				$checked = ! empty($val) ? true : false;
 
 				// if checked, set html
-				$checked = $checked ? ' checked="checked"' : '';
+				$checked = $checked ? ' selected="selected"' : '';
 
 				$option 	= '<option value="%s"%s>%s</option>' . "\n";
 				$html .= sprintf($option, $item['value'], $checked, $item['value']);
@@ -648,6 +684,18 @@ class Formbuilder {
 	 */
 	protected function getPostValue($key){
 		return array_key_exists($key, $_POST) ? $_POST[$key] : false;
+	}
+	
+	/**
+	 * Attempts to load the _data value into the field if it's set (errors)
+	 *
+	 * @param string $key
+	 * @return mixed
+	 */
+	protected function getDataValue($key){
+		if (is_array($this->_data) && ! empty($this->_data)) {
+			return array_key_exists($key, $this->_data) ? $this->_data[$key] : false;
+		}
 	}
 }
 ?>

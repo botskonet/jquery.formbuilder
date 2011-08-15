@@ -527,7 +527,7 @@
 		this.each(function () {
 			var ul_obj = this;
 			var li_count = 0;
-			var c = 1;
+			var c = 0;
 			$(this).children().each(function () {
 				for (att = 0; att < opts.attributes.length; att++) {
 					var key = (opts.attributes[att] === 'class' ? 'cssClass' : opts.attributes[att]);
@@ -537,7 +537,6 @@
 						serialStr += opts.prepend + '[' + li_count + '][required]=' + encodeURIComponent($('#' + $(this).attr('id') + ' input.required').attr('checked'));
 						switch ($(this).attr(opts.attributes[att])) {
 						case 'input_text':
-							c = 1;
 							$('#' + $(this).attr('id') + ' input[type=text]').each(function () {
 								if ($(this).attr('name') === 'code') {
 									serialStr += opts.prepend + '[' + li_count + '][code]=' + encodeURIComponent($(this).val());
@@ -545,11 +544,9 @@
 								else {
 									serialStr += opts.prepend + '[' + li_count + '][values]=' + encodeURIComponent($(this).val());
 								}
-								c++;
 							});
 							break;
 						case 'textarea':
-							c = 1;
 							$('#' + $(this).attr('id') + ' input[type=text]').each(function () {
 								if ($(this).attr('name') === 'code') {
 									serialStr += opts.prepend + '[' + li_count + '][code]=' + encodeURIComponent($(this).val());
@@ -557,11 +554,10 @@
 								else {
 									serialStr += opts.prepend + '[' + li_count + '][values]=' + encodeURIComponent($(this).val());
 								}
-								c++;
 							});
 							break;
 						case 'checkbox':
-							c = 1;
+							c = 0;
 							$('#' + $(this).attr('id') + ' input[type=text]').each(function () {
 								if ($(this).attr('name') === 'title') {
 									serialStr += opts.prepend + '[' + li_count + '][title]=' + encodeURIComponent($(this).val());
@@ -572,12 +568,12 @@
 								else {
 									serialStr += opts.prepend + '[' + li_count + '][values][' + c + '][value]=' + encodeURIComponent($(this).val());
 									serialStr += opts.prepend + '[' + li_count + '][values][' + c + '][baseline]=' + $(this).prev().attr('checked');
+									c++;
 								}
-								c++;
 							});
 							break;
 						case 'radio':
-							c = 1;
+							c = 0;
 							$('#' + $(this).attr('id') + ' input[type=text]').each(function () {
 								if ($(this).attr('name') === 'title') {
 									serialStr += opts.prepend + '[' + li_count + '][title]=' + encodeURIComponent($(this).val());
@@ -588,12 +584,12 @@
 								else {
 									serialStr += opts.prepend + '[' + li_count + '][values][' + c + '][value]=' + encodeURIComponent($(this).val());
 									serialStr += opts.prepend + '[' + li_count + '][values][' + c + '][baseline]=' + $(this).prev().attr('checked');
+									c++;
 								}
-								c++;
 							});
 							break;
 						case 'select':
-							c = 1;
+							c = 0;
 							serialStr += opts.prepend + '[' + li_count + '][multiple]=' + $('#' + $(this).attr('id') + ' input[name=multiple]').attr('checked');
 							$('#' + $(this).attr('id') + ' input[type=text]').each(function () {
 								if ($(this).attr('name') === 'title') {
@@ -605,8 +601,8 @@
 								else {
 									serialStr += opts.prepend + '[' + li_count + '][values][' + c + '][value]=' + encodeURIComponent($(this).val());
 									serialStr += opts.prepend + '[' + li_count + '][values][' + c + '][baseline]=' + $(this).prev().attr('checked');
+									c++;
 								}
-								c++;
 							});
 							break;
 						}

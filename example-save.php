@@ -7,6 +7,8 @@ require('Formbuilder/Formbuilder.php');
 // pass POST directly, but DO NOT use POST without
 // proper security in place.
 
+//print_r($_POST['frmb']);
+
 $form_data = isset($_POST['frmb']) ? $_POST['frmb'] : false;
 $form = new Formbuilder($form_data);
 $for_db = $form->store();

@@ -10,6 +10,8 @@
 
 require('Formbuilder/Formbuilder.php');
 
+//var_dump($_POST);
+
 // At this stage, we simulate getting an array of the
 // form_structure and hash from our database. This is
 // how the form data would have been saved using
