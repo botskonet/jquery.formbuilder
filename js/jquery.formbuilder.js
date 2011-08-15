@@ -15,6 +15,7 @@
 			control_box_target: false,
 			useJson: true, // XML as fallback
 			serialize_prefix: 'frmb',
+			use_ui_icon: false,
 			messages: {
 				save				: "Save",
 				add_new_field		: "Add New Field...",
@@ -26,6 +27,7 @@
 				select				: "Select List",
 				text_field			: "Text Field",
 				label				: "Label",
+				code				: "Code",
 				paragraph_field		: "Paragraph Field",
 				select_options		: "Select Options",
 				add					: "Add",
@@ -149,7 +151,7 @@
 					$(json).each(function () {
 						// checkbox type
 						if (this.cssClass === 'checkbox') {
-							options = [this.title];
+							options = [this.title, this.code];
 							values = [];
 							$.each(this.values, function () {
 								values.push([this.value, this.baseline]);
@@ -157,7 +159,7 @@
 						}
 						// radio type
 						else if (this.cssClass === 'radio') {
-							options = [this.title];
+							options = [this.title, this.code];
 							values = [];
 							$.each(this.values, function () {
 								values.push([this.value, this.baseline]);
@@ -165,14 +167,14 @@
 						}
 						// select type
 						else if (this.cssClass === 'select') {
-							options = [this.title, this.multiple];
+							options = [this.title, this.multiple, this.code];
 							values = [];
 							$.each(this.values, function () {
 								values.push([this.value, this.baseline]);
 							});
 						}
 						else {
-							values = [this.values];
+							values = [this.values, this.code];
 						}
 						appendNewField(this.cssClass, values, options, this.required);
 					});
@@ -204,27 +206,47 @@
 				};
 			// single line input type="text"
 			var appendTextInput = function (values, required) {
-					field += '<label>' + opts.messages.label + '</label>';
-					field += '<input class="fld-title" id="title-' + last_id + '" type="text" value="' + values + '" />';
+					var title = '';
+					var code = '';
+					if (typeof (values) === 'object') {
+						title = values[0];
+						code = values[1];
+					}
+					field += '<div class="frm-fld"><label>' + opts.messages.label + '</label>';
+					field += '<input class="fld-title" id="title-' + last_id + '" type="text" value="' + title + '" /></div>';
+					field += '<div class="frm-fld"><label>' + opts.messages.code + '</label>';
+					field += '<input type="text" name="code" value="' + code + '" /></div>';
 					help = '';
 					appendFieldLi(opts.messages.text, field, required, help);
 				};
 			// multi-line textarea
 			var appendTextarea = function (values, required) {
-					field += '<label>' + opts.messages.label + '</label>';
-					field += '<input type="text" value="' + values + '" />';
+					var title = '';
+					var code = '';
+					if (typeof (values) === 'object') {
+						title = values[0];
+						code = values[1];
+					}
+					field += '<div class="frm-fld"><label>' + opts.messages.label + '</label>';
+					field += '<input type="text" value="' + title + '" /></div>';
+					field += '<div class="frm-fld"><label>' + opts.messages.code + '</label>';
+					field += '<input type="text" name="code" value="' + code + '" /></div>';
 					help = '';
 					appendFieldLi(opts.messages.paragraph_field, field, required, help);
 				};
 			// adds a checkbox element
 			var appendCheckboxGroup = function (values, options, required) {
 					var title = '';
+					var code = '';
 					if (typeof (options) === 'object') {
 						title = options[0];
+						code = options[1];
 					}
 					field += '<div class="chk_group">';
 					field += '<div class="frm-fld"><label>' + opts.messages.title + '</label>';
 					field += '<input type="text" name="title" value="' + title + '" /></div>';
+					field += '<div class="frm-fld"><label>' + opts.messages.code + '</label>';
+					field += '<input type="text" name="code" value="' + code + '" /></div>';
 					field += '<div class="false-label">' + opts.messages.select_options + '</div>';
 					field += '<div class="fields">';
 					if (typeof (values) === 'object') {
@@ -255,17 +277,22 @@
 					field += '<input type="text" value="' + value + '" />';
 					field += '<a href="#" class="remove" title="' + opts.messages.remove_message + '">' + opts.messages.remove + '</a>';
 					field += '</div>';
+					useUiIcon('.remove','ui-icon-trash');
 					return field;
 				};
 			// adds a radio element
 			var appendRadioGroup = function (values, options, required) {
 					var title = '';
+					var code = '';
 					if (typeof (options) === 'object') {
 						title = options[0];
+						code = options[1];
 					}
 					field += '<div class="rd_group">';
 					field += '<div class="frm-fld"><label>' + opts.messages.title + '</label>';
 					field += '<input type="text" name="title" value="' + title + '" /></div>';
+					field += '<div class="frm-fld"><label>' + opts.messages.code + '</label>';
+					field += '<input type="text" name="code" value="' + code + '" /></div>';
 					field += '<div class="false-label">' + opts.messages.select_options + '</div>';
 					field += '<div class="fields">';
 					if (typeof (values) === 'object') {
@@ -296,19 +323,24 @@
 					field += '<input type="text" value="' + value + '" />';
 					field += '<a href="#" class="remove" title="' + opts.messages.remove_message + '">' + opts.messages.remove + '</a>';
 					field += '</div>';
+					useUiIcon('.remove','ui-icon-trash');
 					return field;
 				};
 			// adds a select/option element
 			var appendSelectList = function (values, options, required) {
 					var multiple = false;
 					var title = '';
+					var code = '';
 					if (typeof (options) === 'object') {
 						title = options[0];
 						multiple = options[1] === 'true' ? true : false;
+						code = options[2];
 					}
 					field += '<div class="opt_group">';
 					field += '<div class="frm-fld"><label>' + opts.messages.title + '</label>';
 					field += '<input type="text" name="title" value="' + title + '" /></div>';
+					field += '<div class="frm-fld"><label>' + opts.messages.code + '</label>';
+					field += '<input type="text" name="code" value="' + code + '" /></div>';
 					field += '';
 					field += '<div class="false-label">' + opts.messages.select_options + '</div>';
 					field += '<div class="fields">';
@@ -363,6 +395,11 @@
 						height: 'show'
 					}, 'slow');
 					last_id++;
+					// Use ui-icon
+					useUiIcon('.del-button','ui-icon-trash');
+					useUiIcon('.toggle-form','ui-icon-triangle-1-n');
+					useUiIcon('.add','ui-icon-plus');
+					useUiIcon('.remove','ui-icon-trash');
 				};
 			// handle field delete links
 			$('.remove').live('click', function () {
@@ -378,16 +415,25 @@
 			// handle field display/hide
 			$('.toggle-form').live('click', function () {
 				var target = $(this).attr("id");
-				if ($(this).html() === opts.messages.hide) {
-					$(this).removeClass('open').addClass('closed').html(opts.messages.show);
+				if (opts.use_ui_icon) {
+					var message = $(this).children('.ui-button-text');
+				} else {
+					var message = $(this);
+				}
+				if (message.html() === opts.messages.hide) {
+					$(this).removeClass('open').addClass('closed');
+					useUiIcon('.toggle-form','ui-icon-triangle-1-s');
+					message.html(opts.messages.show);
 					$('#' + target + '-fld').animate({
 						opacity: 'hide',
 						height: 'hide'
 					}, 'slow');
 					return false;
 				}
-				if ($(this).html() === opts.messages.show) {
-					$(this).removeClass('closed').addClass('open').html(opts.messages.hide);
+				if (message.html() === opts.messages.show) {
+					$(this).removeClass('closed').addClass('open');
+					useUiIcon('.toggle-form','ui-icon-triangle-1-n');
+					message.html(opts.messages.hide);
 					$('#' + target + '-fld').animate({
 						opacity: 'show',
 						height: 'show'
@@ -413,18 +459,32 @@
 			// Attach a callback to add new checkboxes
 			$('.add_ck').live('click', function () {
 				$(this).parent().before(checkboxFieldHtml());
+				useUiIcon('.remove','ui-icon-trash');
 				return false;
 			});
 			// Attach a callback to add new options
 			$('.add_opt').live('click', function () {
 				$(this).parent().before(selectFieldHtml('', false));
+				useUiIcon('.remove','ui-icon-trash');
 				return false;
 			});
 			// Attach a callback to add new radio fields
 			$('.add_rd').live('click', function () {
 				$(this).parent().before(radioFieldHtml(false, $(this).parents('.frm-holder').attr('id')));
+				useUiIcon('.remove','ui-icon-trash');
 				return false;
 			});
+			// Use ui-icon
+			var useUiIcon = function (element,icon) {
+				if (opts.use_ui_icon) {
+					$(element).button({
+						icons: {
+							primary: icon
+						},
+						text: false
+					});
+				}
+			}
 			// saves the serialized data to the server 
 			var save = function () {
 					if (opts.save_url) {
@@ -477,16 +537,37 @@
 						serialStr += opts.prepend + '[' + li_count + '][required]=' + encodeURIComponent($('#' + $(this).attr('id') + ' input.required').attr('checked'));
 						switch ($(this).attr(opts.attributes[att])) {
 						case 'input_text':
-							serialStr += opts.prepend + '[' + li_count + '][values]=' + encodeURIComponent($('#' + $(this).attr('id') + ' input[type=text]').val());
+							c = 1;
+							$('#' + $(this).attr('id') + ' input[type=text]').each(function () {
+								if ($(this).attr('name') === 'code') {
+									serialStr += opts.prepend + '[' + li_count + '][code]=' + encodeURIComponent($(this).val());
+								}
+								else {
+									serialStr += opts.prepend + '[' + li_count + '][values]=' + encodeURIComponent($(this).val());
+								}
+								c++;
+							});
 							break;
 						case 'textarea':
-							serialStr += opts.prepend + '[' + li_count + '][values]=' + encodeURIComponent($('#' + $(this).attr('id') + ' input[type=text]').val());
+							c = 1;
+							$('#' + $(this).attr('id') + ' input[type=text]').each(function () {
+								if ($(this).attr('name') === 'code') {
+									serialStr += opts.prepend + '[' + li_count + '][code]=' + encodeURIComponent($(this).val());
+								}
+								else {
+									serialStr += opts.prepend + '[' + li_count + '][values]=' + encodeURIComponent($(this).val());
+								}
+								c++;
+							});
 							break;
 						case 'checkbox':
 							c = 1;
 							$('#' + $(this).attr('id') + ' input[type=text]').each(function () {
 								if ($(this).attr('name') === 'title') {
 									serialStr += opts.prepend + '[' + li_count + '][title]=' + encodeURIComponent($(this).val());
+								}
+								else if ($(this).attr('name') === 'code') {
+									serialStr += opts.prepend + '[' + li_count + '][code]=' + encodeURIComponent($(this).val());
 								}
 								else {
 									serialStr += opts.prepend + '[' + li_count + '][values][' + c + '][value]=' + encodeURIComponent($(this).val());
@@ -501,6 +582,9 @@
 								if ($(this).attr('name') === 'title') {
 									serialStr += opts.prepend + '[' + li_count + '][title]=' + encodeURIComponent($(this).val());
 								}
+								else if ($(this).attr('name') === 'code') {
+									serialStr += opts.prepend + '[' + li_count + '][code]=' + encodeURIComponent($(this).val());
+								}
 								else {
 									serialStr += opts.prepend + '[' + li_count + '][values][' + c + '][value]=' + encodeURIComponent($(this).val());
 									serialStr += opts.prepend + '[' + li_count + '][values][' + c + '][baseline]=' + $(this).prev().attr('checked');
@@ -514,6 +598,9 @@
 							$('#' + $(this).attr('id') + ' input[type=text]').each(function () {
 								if ($(this).attr('name') === 'title') {
 									serialStr += opts.prepend + '[' + li_count + '][title]=' + encodeURIComponent($(this).val());
+								}
+								else if ($(this).attr('name') === 'code') {
+									serialStr += opts.prepend + '[' + li_count + '][code]=' + encodeURIComponent($(this).val());
 								}
 								else {
 									serialStr += opts.prepend + '[' + li_count + '][values][' + c + '][value]=' + encodeURIComponent($(this).val());

@@ -12,7 +12,7 @@ ul.frmb {
 .frmb li {
 	margin-bottom: 5px;
 	padding: 5px;
-	border: 1px solid #EEE;
+	border: 1px solid #000;
 }
 
 .frmb li:hover {
@@ -87,13 +87,14 @@ ul.frmb {
 
 .frm-elements .fields .add-area {
 	position: relative;
-	left: -30px;
+	left: -35px;
 	line-height: 0;
-	margin-top: -13px;
+	/*margin-top: -20px;*/
 }
 
 .frm-elements .fields .add-area .add {
 	clear: both;
+	/*float: right;*/
 }
 
 .frm-elements:after,
