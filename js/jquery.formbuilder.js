@@ -151,7 +151,7 @@
 					$(json).each(function () {
 						// checkbox type
 						if (this.cssClass === 'checkbox') {
-							options = [this.title];
+							options = [this.title, this.code];
 							values = [];
 							$.each(this.values, function () {
 								values.push([this.value, this.baseline]);
@@ -159,7 +159,7 @@
 						}
 						// radio type
 						else if (this.cssClass === 'radio') {
-							options = [this.title];
+							options = [this.title, this.code];
 							values = [];
 							$.each(this.values, function () {
 								values.push([this.value, this.baseline]);
@@ -167,14 +167,14 @@
 						}
 						// select type
 						else if (this.cssClass === 'select') {
-							options = [this.title, this.multiple];
+							options = [this.title, this.multiple, this.code];
 							values = [];
 							$.each(this.values, function () {
 								values.push([this.value, this.baseline]);
 							});
 						}
 						else {
-							values = [this.values];
+							values = [this.values, this.code];
 						}
 						appendNewField(this.cssClass, values, options, this.required);
 					});
@@ -206,27 +206,47 @@
 				};
 			// single line input type="text"
 			var appendTextInput = function (values, required) {
-					field += '<label>' + opts.messages.label + '</label>';
-					field += '<input class="fld-title" id="title-' + last_id + '" type="text" value="' + values + '" />';
+					var title = '';
+					var code = '';
+					if (typeof (values) === 'object') {
+						title = values[0];
+						code = values[1];
+					}
+					field += '<div class="frm-fld"><label>' + opts.messages.label + '</label>';
+					field += '<input class="fld-title" id="title-' + last_id + '" type="text" value="' + title + '" /></div>';
+					field += '<div class="frm-fld"><label>' + opts.messages.code + '</label>';
+					field += '<input type="text" name="code" value="' + code + '" /></div>';
 					help = '';
 					appendFieldLi(opts.messages.text, field, required, help);
 				};
 			// multi-line textarea
 			var appendTextarea = function (values, required) {
-					field += '<label>' + opts.messages.label + '</label>';
-					field += '<input type="text" value="' + values + '" />';
+					var title = '';
+					var code = '';
+					if (typeof (values) === 'object') {
+						title = values[0];
+						code = values[1];
+					}
+					field += '<div class="frm-fld"><label>' + opts.messages.label + '</label>';
+					field += '<input type="text" value="' + title + '" /></div>';
+					field += '<div class="frm-fld"><label>' + opts.messages.code + '</label>';
+					field += '<input type="text" name="code" value="' + code + '" /></div>';
 					help = '';
 					appendFieldLi(opts.messages.paragraph_field, field, required, help);
 				};
 			// adds a checkbox element
 			var appendCheckboxGroup = function (values, options, required) {
 					var title = '';
+					var code = '';
 					if (typeof (options) === 'object') {
 						title = options[0];
+						code = options[1];
 					}
 					field += '<div class="chk_group">';
 					field += '<div class="frm-fld"><label>' + opts.messages.title + '</label>';
 					field += '<input type="text" name="title" value="' + title + '" /></div>';
+					field += '<div class="frm-fld"><label>' + opts.messages.code + '</label>';
+					field += '<input type="text" name="code" value="' + code + '" /></div>';
 					field += '<div class="false-label">' + opts.messages.select_options + '</div>';
 					field += '<div class="fields">';
 					if (typeof (values) === 'object') {
@@ -263,12 +283,16 @@
 			// adds a radio element
 			var appendRadioGroup = function (values, options, required) {
 					var title = '';
+					var code = '';
 					if (typeof (options) === 'object') {
 						title = options[0];
+						code = options[1];
 					}
 					field += '<div class="rd_group">';
 					field += '<div class="frm-fld"><label>' + opts.messages.title + '</label>';
 					field += '<input type="text" name="title" value="' + title + '" /></div>';
+					field += '<div class="frm-fld"><label>' + opts.messages.code + '</label>';
+					field += '<input type="text" name="code" value="' + code + '" /></div>';
 					field += '<div class="false-label">' + opts.messages.select_options + '</div>';
 					field += '<div class="fields">';
 					if (typeof (values) === 'object') {
@@ -306,13 +330,17 @@
 			var appendSelectList = function (values, options, required) {
 					var multiple = false;
 					var title = '';
+					var code = '';
 					if (typeof (options) === 'object') {
 						title = options[0];
 						multiple = options[1] === 'true' ? true : false;
+						code = options[2];
 					}
 					field += '<div class="opt_group">';
 					field += '<div class="frm-fld"><label>' + opts.messages.title + '</label>';
 					field += '<input type="text" name="title" value="' + title + '" /></div>';
+					field += '<div class="frm-fld"><label>' + opts.messages.code + '</label>';
+					field += '<input type="text" name="code" value="' + code + '" /></div>';
 					field += '';
 					field += '<div class="false-label">' + opts.messages.select_options + '</div>';
 					field += '<div class="fields">';
@@ -509,16 +537,37 @@
 						serialStr += opts.prepend + '[' + li_count + '][required]=' + encodeURIComponent($('#' + $(this).attr('id') + ' input.required').attr('checked'));
 						switch ($(this).attr(opts.attributes[att])) {
 						case 'input_text':
-							serialStr += opts.prepend + '[' + li_count + '][values]=' + encodeURIComponent($('#' + $(this).attr('id') + ' input[type=text]').val());
+							c = 1;
+							$('#' + $(this).attr('id') + ' input[type=text]').each(function () {
+								if ($(this).attr('name') === 'code') {
+									serialStr += opts.prepend + '[' + li_count + '][code]=' + encodeURIComponent($(this).val());
+								}
+								else {
+									serialStr += opts.prepend + '[' + li_count + '][values]=' + encodeURIComponent($(this).val());
+								}
+								c++;
+							});
 							break;
 						case 'textarea':
-							serialStr += opts.prepend + '[' + li_count + '][values]=' + encodeURIComponent($('#' + $(this).attr('id') + ' input[type=text]').val());
+							c = 1;
+							$('#' + $(this).attr('id') + ' input[type=text]').each(function () {
+								if ($(this).attr('name') === 'code') {
+									serialStr += opts.prepend + '[' + li_count + '][code]=' + encodeURIComponent($(this).val());
+								}
+								else {
+									serialStr += opts.prepend + '[' + li_count + '][values]=' + encodeURIComponent($(this).val());
+								}
+								c++;
+							});
 							break;
 						case 'checkbox':
 							c = 1;
 							$('#' + $(this).attr('id') + ' input[type=text]').each(function () {
 								if ($(this).attr('name') === 'title') {
 									serialStr += opts.prepend + '[' + li_count + '][title]=' + encodeURIComponent($(this).val());
+								}
+								else if ($(this).attr('name') === 'code') {
+									serialStr += opts.prepend + '[' + li_count + '][code]=' + encodeURIComponent($(this).val());
 								}
 								else {
 									serialStr += opts.prepend + '[' + li_count + '][values][' + c + '][value]=' + encodeURIComponent($(this).val());
@@ -533,6 +582,9 @@
 								if ($(this).attr('name') === 'title') {
 									serialStr += opts.prepend + '[' + li_count + '][title]=' + encodeURIComponent($(this).val());
 								}
+								else if ($(this).attr('name') === 'code') {
+									serialStr += opts.prepend + '[' + li_count + '][code]=' + encodeURIComponent($(this).val());
+								}
 								else {
 									serialStr += opts.prepend + '[' + li_count + '][values][' + c + '][value]=' + encodeURIComponent($(this).val());
 									serialStr += opts.prepend + '[' + li_count + '][values][' + c + '][baseline]=' + $(this).prev().attr('checked');
@@ -546,6 +598,9 @@
 							$('#' + $(this).attr('id') + ' input[type=text]').each(function () {
 								if ($(this).attr('name') === 'title') {
 									serialStr += opts.prepend + '[' + li_count + '][title]=' + encodeURIComponent($(this).val());
+								}
+								else if ($(this).attr('name') === 'code') {
+									serialStr += opts.prepend + '[' + li_count + '][code]=' + encodeURIComponent($(this).val());
 								}
 								else {
 									serialStr += opts.prepend + '[' + li_count + '][values][' + c + '][value]=' + encodeURIComponent($(this).val());
