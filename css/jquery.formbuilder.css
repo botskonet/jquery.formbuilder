@@ -87,14 +87,14 @@ ul.frmb {
 
 .frm-elements .fields .add-area {
 	position: relative;
-	right: 115px;
+	left: -35px;
 	line-height: 0;
 	/*margin-top: -20px;*/
 }
 
 .frm-elements .fields .add-area .add {
 	clear: both;
-	float: right;
+	/*float: right;*/
 }
 
 .frm-elements:after,

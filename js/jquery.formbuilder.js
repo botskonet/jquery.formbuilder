@@ -257,14 +257,7 @@
 					field += '<input type="text" value="' + value + '" />';
 					field += '<a href="#" class="remove" title="' + opts.messages.remove_message + '">' + opts.messages.remove + '</a>';
 					field += '</div>';
-					if (opts.use_ui_icon) {
-						$('.remove').button({
-							icons: {
-								primary: 'ui-icon-trash'
-							},
-							text: false
-						});
-					}
+					useUiIcon('.remove','ui-icon-trash');
 					return field;
 				};
 			// adds a radio element
@@ -306,14 +299,7 @@
 					field += '<input type="text" value="' + value + '" />';
 					field += '<a href="#" class="remove" title="' + opts.messages.remove_message + '">' + opts.messages.remove + '</a>';
 					field += '</div>';
-					if (opts.use_ui_icon) {
-						$('.remove').button({
-							icons: {
-								primary: 'ui-icon-trash'
-							},
-							text: false
-						});
-					}
+					useUiIcon('.remove','ui-icon-trash');
 					return field;
 				};
 			// adds a select/option element
@@ -382,32 +368,10 @@
 					}, 'slow');
 					last_id++;
 					// Use ui-icon
-					if (opts.use_ui_icon) {
-						$('.del-button').button({
-							icons: {
-								primary: 'ui-icon-trash'
-							},
-							text: false
-						});
-						$('.toggle-form').button({
-							icons: {
-								primary: 'ui-icon-triangle-1-n'
-							},
-							text: false
-						});
-						$('.add').button({
-							icons: {
-								primary: 'ui-icon-plus'
-							},
-							text: false
-						});
-						$('.remove').button({
-							icons: {
-								primary: 'ui-icon-trash'
-							},
-							text: false
-						});
-					}
+					useUiIcon('.del-button','ui-icon-trash');
+					useUiIcon('.toggle-form','ui-icon-triangle-1-n');
+					useUiIcon('.add','ui-icon-plus');
+					useUiIcon('.remove','ui-icon-trash');
 				};
 			// handle field delete links
 			$('.remove').live('click', function () {
@@ -430,13 +394,7 @@
 				}
 				if (message.html() === opts.messages.hide) {
 					$(this).removeClass('open').addClass('closed');
-					if (opts.use_ui_icon) {
-						$(this).button({
-							icons: {
-								primary: 'ui-icon-triangle-1-s'
-							}
-						});
-					}
+					useUiIcon('.toggle-form','ui-icon-triangle-1-s');
 					message.html(opts.messages.show);
 					$('#' + target + '-fld').animate({
 						opacity: 'hide',
@@ -446,13 +404,7 @@
 				}
 				if (message.html() === opts.messages.show) {
 					$(this).removeClass('closed').addClass('open');
-					if (opts.use_ui_icon) {
-						$(this).button({
-							icons: {
-								primary: 'ui-icon-triangle-1-n'
-							}
-						});
-					}
+					useUiIcon('.toggle-form','ui-icon-triangle-1-n');
 					message.html(opts.messages.hide);
 					$('#' + target + '-fld').animate({
 						opacity: 'show',
@@ -479,18 +431,32 @@
 			// Attach a callback to add new checkboxes
 			$('.add_ck').live('click', function () {
 				$(this).parent().before(checkboxFieldHtml());
+				useUiIcon('.remove','ui-icon-trash');
 				return false;
 			});
 			// Attach a callback to add new options
 			$('.add_opt').live('click', function () {
 				$(this).parent().before(selectFieldHtml('', false));
+				useUiIcon('.remove','ui-icon-trash');
 				return false;
 			});
 			// Attach a callback to add new radio fields
 			$('.add_rd').live('click', function () {
 				$(this).parent().before(radioFieldHtml(false, $(this).parents('.frm-holder').attr('id')));
+				useUiIcon('.remove','ui-icon-trash');
 				return false;
 			});
+			// Use ui-icon
+			var useUiIcon = function (element,icon) {
+				if (opts.use_ui_icon) {
+					$(element).button({
+						icons: {
+							primary: icon
+						},
+						text: false
+					});
+				}
+			}
 			// saves the serialized data to the server 
 			var save = function () {
 					if (opts.save_url) {
