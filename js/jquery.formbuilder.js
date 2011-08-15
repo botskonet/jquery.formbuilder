@@ -214,10 +214,8 @@
 					}
 					field += '<div class="frm-fld"><label>' + opts.messages.label + '</label>';
 					field += '<input class="fld-title" id="title-' + last_id + '" type="text" value="' + title + '" /></div>';
-					field += '<div class="frm-fld"><label>' + opts.messages.code + '</label>';
-					field += '<input type="text" name="code" value="' + code + '" /></div>';
 					help = '';
-					appendFieldLi(opts.messages.text, field, required, help);
+					appendFieldLi(opts.messages.text, field, required, help, code);
 				};
 			// multi-line textarea
 			var appendTextarea = function (values, required) {
@@ -229,10 +227,8 @@
 					}
 					field += '<div class="frm-fld"><label>' + opts.messages.label + '</label>';
 					field += '<input type="text" value="' + title + '" /></div>';
-					field += '<div class="frm-fld"><label>' + opts.messages.code + '</label>';
-					field += '<input type="text" name="code" value="' + code + '" /></div>';
 					help = '';
-					appendFieldLi(opts.messages.paragraph_field, field, required, help);
+					appendFieldLi(opts.messages.paragraph_field, field, required, help, code);
 				};
 			// adds a checkbox element
 			var appendCheckboxGroup = function (values, options, required) {
@@ -245,8 +241,6 @@
 					field += '<div class="chk_group">';
 					field += '<div class="frm-fld"><label>' + opts.messages.title + '</label>';
 					field += '<input type="text" name="title" value="' + title + '" /></div>';
-					field += '<div class="frm-fld"><label>' + opts.messages.code + '</label>';
-					field += '<input type="text" name="code" value="' + code + '" /></div>';
 					field += '<div class="false-label">' + opts.messages.select_options + '</div>';
 					field += '<div class="fields">';
 					if (typeof (values) === 'object') {
@@ -261,7 +255,7 @@
 					field += '</div>';
 					field += '</div>';
 					help = '';
-					appendFieldLi(opts.messages.checkbox_group, field, required, help);
+					appendFieldLi(opts.messages.checkbox_group, field, required, help, code);
 				};
 			// Checkbox field html, since there may be multiple
 			var checkboxFieldHtml = function (values) {
@@ -291,8 +285,6 @@
 					field += '<div class="rd_group">';
 					field += '<div class="frm-fld"><label>' + opts.messages.title + '</label>';
 					field += '<input type="text" name="title" value="' + title + '" /></div>';
-					field += '<div class="frm-fld"><label>' + opts.messages.code + '</label>';
-					field += '<input type="text" name="code" value="' + code + '" /></div>';
 					field += '<div class="false-label">' + opts.messages.select_options + '</div>';
 					field += '<div class="fields">';
 					if (typeof (values) === 'object') {
@@ -307,7 +299,7 @@
 					field += '</div>';
 					field += '</div>';
 					help = '';
-					appendFieldLi(opts.messages.radio_group, field, required, help);
+					appendFieldLi(opts.messages.radio_group, field, required, help, code);
 				};
 			// Radio field html, since there may be multiple
 			var radioFieldHtml = function (values, name) {
@@ -339,8 +331,6 @@
 					field += '<div class="opt_group">';
 					field += '<div class="frm-fld"><label>' + opts.messages.title + '</label>';
 					field += '<input type="text" name="title" value="' + title + '" /></div>';
-					field += '<div class="frm-fld"><label>' + opts.messages.code + '</label>';
-					field += '<input type="text" name="code" value="' + code + '" /></div>';
 					field += '';
 					field += '<div class="false-label">' + opts.messages.select_options + '</div>';
 					field += '<div class="fields">';
@@ -358,7 +348,7 @@
 					field += '</div>';
 					field += '</div>';
 					help = '';
-					appendFieldLi(opts.messages.select, field, required, help);
+					appendFieldLi(opts.messages.select, field, required, help, code);
 				};
 			// Select field html, since there may be multiple
 			var selectFieldHtml = function (values, multiple) {
@@ -370,9 +360,13 @@
 					}
 				};
 			// Appends the new field markup to the editor
-			var appendFieldLi = function (title, field_html, required, help) {
+			var appendFieldLi = function (title, field_html, required, help, code) {
 					if (required) {
 						required = required === 'checked' ? true : false;
+					}
+					var disabled = '';
+					if (code.length > 0) {
+						disabled = ' disabled="disabled"';
 					}
 					var li = '';
 					li += '<li id="frm-' + last_id + '-item" class="' + field_type + '">';
@@ -384,7 +378,9 @@
 					li += '<div class="frm-elements">';
 					li += '<div class="frm-fld"><label for="required-' + last_id + '">' + opts.messages.required + '</label>';
 					li += '<input class="required" type="checkbox" value="1" name="required-' + last_id + '" id="required-' + last_id + '"' + (required ? ' checked="checked"' : '') + ' /></div>';
-					li += field;
+					li += '<div class="frm-fld"><label>' + opts.messages.code + '</label>';
+					li += '<input type="text" name="code" value="' + code + '"' + disabled + ' /></div>';
+					li += field_html;
 					li += '</div>';
 					li += '</div>';
 					li += '</li>';
