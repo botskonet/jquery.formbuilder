@@ -15,6 +15,7 @@
 			control_box_target: false,
 			useJson: true, // XML as fallback
 			serialize_prefix: 'frmb',
+			use_ui_icon: false,
 			messages: {
 				save				: "Save",
 				add_new_field		: "Add New Field...",
@@ -26,6 +27,7 @@
 				select				: "Select List",
 				text_field			: "Text Field",
 				label				: "Label",
+				code				: "Code",
 				paragraph_field		: "Paragraph Field",
 				select_options		: "Select Options",
 				add					: "Add",
@@ -255,6 +257,14 @@
 					field += '<input type="text" value="' + value + '" />';
 					field += '<a href="#" class="remove" title="' + opts.messages.remove_message + '">' + opts.messages.remove + '</a>';
 					field += '</div>';
+					if (opts.use_ui_icon) {
+						$('.remove').button({
+							icons: {
+								primary: 'ui-icon-trash'
+							},
+							text: false
+						});
+					}
 					return field;
 				};
 			// adds a radio element
@@ -296,6 +306,14 @@
 					field += '<input type="text" value="' + value + '" />';
 					field += '<a href="#" class="remove" title="' + opts.messages.remove_message + '">' + opts.messages.remove + '</a>';
 					field += '</div>';
+					if (opts.use_ui_icon) {
+						$('.remove').button({
+							icons: {
+								primary: 'ui-icon-trash'
+							},
+							text: false
+						});
+					}
 					return field;
 				};
 			// adds a select/option element
@@ -363,30 +381,33 @@
 						height: 'show'
 					}, 'slow');
 					last_id++;
-					$('.del-button').button({
-						icons: {
-							primary: 'ui-icon-trash'
-						},
-						text: false
-					});
-					$('.toggle-form').button({
-						icons: {
-							primary: 'ui-icon-triangle-1-n'
-						},
-						text: false
-					});
-					$('.add').button({
-						icons: {
-							primary: 'ui-icon-plus'
-						},
-						text: false
-					});
-					$('.remove').button({
-						icons: {
-							primary: 'ui-icon-trash'
-						},
-						text: false
-					});
+					// Use ui-icon
+					if (opts.use_ui_icon) {
+						$('.del-button').button({
+							icons: {
+								primary: 'ui-icon-trash'
+							},
+							text: false
+						});
+						$('.toggle-form').button({
+							icons: {
+								primary: 'ui-icon-triangle-1-n'
+							},
+							text: false
+						});
+						$('.add').button({
+							icons: {
+								primary: 'ui-icon-plus'
+							},
+							text: false
+						});
+						$('.remove').button({
+							icons: {
+								primary: 'ui-icon-trash'
+							},
+							text: false
+						});
+					}
 				};
 			// handle field delete links
 			$('.remove').live('click', function () {
@@ -402,30 +423,37 @@
 			// handle field display/hide
 			$('.toggle-form').live('click', function () {
 				var target = $(this).attr("id");
-				if ($(this).children('.ui-button-text').html() === opts.messages.hide) {
-					$(this).removeClass('open')
-							.addClass('closed')
-							.button({
-								icons: {
-									primary: 'ui-icon-triangle-1-s'
-								}
-							});
-					$(this).children('.ui-button-text').html(opts.messages.show);
+				if (opts.use_ui_icon) {
+					var message = $(this).children('.ui-button-text');
+				} else {
+					var message = $(this);
+				}
+				if (message.html() === opts.messages.hide) {
+					$(this).removeClass('open').addClass('closed');
+					if (opts.use_ui_icon) {
+						$(this).button({
+							icons: {
+								primary: 'ui-icon-triangle-1-s'
+							}
+						});
+					}
+					message.html(opts.messages.show);
 					$('#' + target + '-fld').animate({
 						opacity: 'hide',
 						height: 'hide'
 					}, 'slow');
 					return false;
 				}
-				if ($(this).children('.ui-button-text').html() === opts.messages.show) {
-					$(this).removeClass('closed')
-							.addClass('open')
-							.button({
-								icons: {
-									primary: 'ui-icon-triangle-1-n'
-								}
-							});
-					$(this).children('.ui-button-text').html(opts.messages.hide);
+				if (message.html() === opts.messages.show) {
+					$(this).removeClass('closed').addClass('open');
+					if (opts.use_ui_icon) {
+						$(this).button({
+							icons: {
+								primary: 'ui-icon-triangle-1-n'
+							}
+						});
+					}
+					message.html(opts.messages.hide);
 					$('#' + target + '-fld').animate({
 						opacity: 'show',
 						height: 'show'
