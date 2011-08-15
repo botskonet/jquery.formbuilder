@@ -453,6 +453,9 @@ class Formbuilder {
 				case 'select':
 					return $this->loadSelectBox($field);
 					break;
+				case 'comment':
+					return $this->loadComment($field);
+					break;
 			}
 		}
 
@@ -655,6 +658,24 @@ class Formbuilder {
 			$html .= '</li>' . "\n";
 
 		}
+
+		return $html;
+
+	}
+	
+	/**
+	 * Returns html for an comment <p>
+	 * 
+	 * @param array $field Field values from database
+	 * @access protected
+	 * @return string
+	 */
+	protected function loadComment($field){
+		
+		$field_value = $this->getDataValue($field['code']);
+
+		$html = '';
+		$html .= sprintf('<p>%s</p>', $field_value) . "\n";
 
 		return $html;
 

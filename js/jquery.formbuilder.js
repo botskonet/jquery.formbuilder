@@ -21,6 +21,7 @@
 				add_new_field		: "Add New Field...",
 				text				: "Text Field",
 				title				: "Title",
+				comment				: "Comment",
 				paragraph			: "Paragraph",
 				checkboxes			: "Checkboxes",
 				radio				: "Radio",
@@ -28,6 +29,7 @@
 				text_field			: "Text Field",
 				label				: "Label",
 				code				: "Code",
+				comment_field		: "Comment Field",
 				paragraph_field		: "Paragraph Field",
 				select_options		: "Select Options",
 				add					: "Add",
@@ -79,6 +81,7 @@
 					select += '<option value="checkbox">' + opts.messages.checkboxes + '</option>';
 					select += '<option value="radio">' + opts.messages.radio + '</option>';
 					select += '<option value="select">' + opts.messages.select + '</option>';
+					select += '<option value="comment">' + opts.messages.comment + '</option>';
 					// Build the control box and search button content
 					box_content = '<select id="' + box_id + '" class="frmb-control">' + select + '</select>';
 					save_button = '<input type="submit" id="' + save_id + '" class="frmb-submit" value="' + opts.messages.save + '"/>';
@@ -202,7 +205,24 @@
 					case 'select':
 						appendSelectList(values, options, required);
 						break;
+					case 'comment':
+						appendComment(values);
+						break;
 					}
+				};
+			// Adds a comment of some kind to the form.
+			var appendComment = function (values) {
+				var title = '';
+				var code = '';
+				if (typeof (values) === 'object') {
+					title = values[0];
+					code = values[1];
+				}
+					field += '<label>' + opts.messages.comment + '</label>';
+					field += '<input class="fld-title" id="title-' + last_id + '" type="text" value="' + title + '" />';
+					help = '';
+					required = false;
+					appendFieldLi(opts.messages.comment_field, field, required, help, code);
 				};
 			// single line input type="text"
 			var appendTextInput = function (values, required) {
@@ -376,8 +396,10 @@
 					li += '<strong id="txt-title-' + last_id + '">' + title + '</strong></div>';
 					li += '<div id="frm-' + last_id + '-fld" class="frm-holder">';
 					li += '<div class="frm-elements">';
-					li += '<div class="frm-fld"><label for="required-' + last_id + '">' + opts.messages.required + '</label>';
-					li += '<input class="required" type="checkbox" value="1" name="required-' + last_id + '" id="required-' + last_id + '"' + (required ? ' checked="checked"' : '') + ' /></div>';
+					if (required) {
+						li += '<div class="frm-fld"><label for="required-' + last_id + '">' + opts.messages.required + '</label>';
+						li += '<input class="required" type="checkbox" value="1" name="required-' + last_id + '" id="required-' + last_id + '"' + (required ? ' checked="checked"' : '') + ' /></div>';
+					}
 					li += '<div class="frm-fld"><label>' + opts.messages.code + '</label>';
 					li += '<input type="text" name="code" value="' + code + '"' + disabled + ' /></div>';
 					li += field_html;
@@ -601,6 +623,16 @@
 								}
 							});
 							break;
+						case 'comment':
+							$('#' + $(this).attr('id') + ' input[type=text]').each(function () {
+								if ($(this).attr('name') === 'code') {
+									serialStr += opts.prepend + '[' + li_count + '][code]=' + encodeURIComponent($(this).val());
+								}
+								else {
+									serialStr += opts.prepend + '[' + li_count + '][values]=' + encodeURIComponent($(this).val());
+								}
+							});
+							break; 
 						}
 					}
 				}
