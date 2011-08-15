@@ -326,36 +326,38 @@ class Formbuilder {
 		if(is_array($this->_structure)){
 			foreach($this->_structure as $field){
 
-				$field['required'] = $field['required'] == 'true' ? true : false;
+				$field['required'] = $field['required'] == 'checked' ? true : false;
 
 				if($field['cssClass'] == 'input_text' || $field['cssClass'] == 'textarea'){
 
-					$val = $this->getPostValue( $this->elemId($field['values']));
+					$val = $this->getPostValue( $field['code'] );
 
 					if($field['required'] && empty($val)){
 						$error .= '<li>Please complete the ' . $field['values'] . ' field.</li>' . "\n";
 					} else {
-						$results[ $this->elemId($field['values']) ] = $val;
+						$results[ $field['code'] ] = $val;
 					}
 				}
 				elseif($field['cssClass'] == 'radio' || $field['cssClass'] == 'select'){
 
-					$val = $this->getPostValue( $this->elemId($field['title']));
+					$val = $this->getPostValue( $field['code'] );
 
 					if($field['required'] && empty($val)){
 						$error .= '<li>Please complete the ' . $field['title'] . ' field.</li>' . "\n";
 					} else {
-						$results[ $this->elemId($field['title']) ] = $val;
+						$results[ $field['code'] ] = $val;
 					}
 				}
 				elseif($field['cssClass'] == 'checkbox'){
 					if(is_array($field['values'])){
 
 						$at_least_one_checked = false;
+						
+						$i=0;
 
 						foreach($field['values'] as $item){
-
-							$elem_id = $this->elemId($item['value'], $field['title']);
+							
+							$elem_id = $field['code'].'-'.$i;
 
 							$val = $this->getPostValue( $elem_id );
 
@@ -363,7 +365,9 @@ class Formbuilder {
 								$at_least_one_checked = true;
 							}
 
-							$results[ $this->elemId($item['value']) ] = $this->getPostValue( $elem_id );
+							$results[ $elem_id ] = $val;
+							
+							$i++;
 						}
 
 						if(!$at_least_one_checked && $field['required']){
@@ -432,15 +436,15 @@ class Formbuilder {
 	 */
 	protected function loadInputText($field){
 
-		$field['required'] = $field['required'] == 'true' ? ' required' : false;
+		$field['required'] = $field['required'] == 'checked' ? ' required' : false;
 
 		$html = '';
-		$html .= sprintf('<li class="%s%s" id="fld-%s">' . "\n", $this->elemId($field['cssClass']), $field['required'], $this->elemId($field['values']));
-		$html .= sprintf('<label for="%s">%s</label>' . "\n", $this->elemId($field['values']), $field['values']);
+		$html .= sprintf('<li class="%s%s" id="fld-%s">' . "\n", $this->elemId($field['cssClass']), $field['required'], $field['code']);
+		$html .= sprintf('<label for="%s">%s</label>' . "\n", $field['code'], $field['values']);
 		$html .= sprintf('<input type="text" id="%s" name="%s" value="%s" />' . "\n",
-								$this->elemId($field['values']),
-								$this->elemId($field['values']),
-								$this->getPostValue($this->elemId($field['values'])));
+								$field['code'],
+								$field['code'],
+								$this->getPostValue($field['code']));
 		$html .= '</li>' . "\n";
 
 		return $html;
@@ -457,15 +461,15 @@ class Formbuilder {
 	 */
 	protected function loadTextarea($field){
 
-		$field['required'] = $field['required'] == 'true' ? ' required' : false;
+		$field['required'] = $field['required'] == 'checked' ? ' required' : false;
 
 		$html = '';
-		$html .= sprintf('<li class="%s%s" id="fld-%s">' . "\n", $this->elemId($field['cssClass']), $field['required'], $this->elemId($field['values']));
-		$html .= sprintf('<label for="%s">%s</label>' . "\n", $this->elemId($field['values']), $field['values']);
+		$html .= sprintf('<li class="%s%s" id="fld-%s">' . "\n", $this->elemId($field['cssClass']), $field['required'], $field['code']);
+		$html .= sprintf('<label for="%s">%s</label>' . "\n", $field['code'], $field['values']);
 		$html .= sprintf('<textarea id="%s" name="%s" rows="5" cols="50">%s</textarea>' . "\n",
-								$this->elemId($field['values']),
-								$this->elemId($field['values']),
-								$this->getPostValue($this->elemId($field['values'])));
+								$field['code'],
+								$field['code'],
+								$this->getPostValue($field['code']));
 		$html .= '</li>' . "\n";
 
 		return $html;
@@ -482,10 +486,10 @@ class Formbuilder {
 	 */
 	protected function loadCheckboxGroup($field){
 
-		$field['required'] = $field['required'] == 'true' ? ' required' : false;
+		$field['required'] = $field['required'] == 'checked' ? ' required' : false;
 
 		$html = '';
-		$html .= sprintf('<li class="%s%s" id="fld-%s">' . "\n", $this->elemId($field['cssClass']), $field['required'], $this->elemId($field['title']));
+		$html .= sprintf('<li class="%s%s" id="fld-%s">' . "\n", $this->elemId($field['cssClass']), $field['required'], $field['code']);
 
 		if(isset($field['title']) && !empty($field['title'])){
 			$html .= sprintf('<span class="false_label">%s</span>' . "\n", $field['title']);
@@ -493,20 +497,23 @@ class Formbuilder {
 
 		if(isset($field['values']) && is_array($field['values'])){
 			$html .= sprintf('<span class="multi-row clearfix">') . "\n";
+			$i=0;
 			foreach($field['values'] as $item){
 
 				// set the default checked value
 				$checked = $item['default'] == 'true' ? true : false;
 
 				// load post value
-				$val = $this->getPostValue($this->elemId($item['value']));
+				$val = $this->getPostValue($field['code'].'-'.$i);
 				$checked = !empty($val);
 
 				// if checked, set html
 				$checked = $checked ? ' checked="checked"' : '';
 
-				$checkbox 	= '<span class="row clearfix"><input type="checkbox" id="%s-%s" name="%s-%s" value="%s"%s /><label for="%s-%s">%s</label></span>' . "\n";
-				$html .= sprintf($checkbox, $this->elemId($field['title']), $this->elemId($item['value']), $this->elemId($field['title']), $this->elemId($item['value']), $item['value'], $checked, $this->elemId($field['title']), $this->elemId($item['value']), $item['value']);
+				$checkbox 	= '<span class="row clearfix"><input type="checkbox" id="%s-'.$i.'" name="%s-'.$i.'" value="%s"%s /><label for="%s-'.$i.'">%s</label></span>' . "\n";
+				$html .= sprintf($checkbox, $field['code'], $field['code'], $item['value'], $checked, $field['code'], $item['value']);
+				
+				$i++;
 			}
 			$html .= sprintf('</span>') . "\n";
 		}
@@ -526,11 +533,11 @@ class Formbuilder {
 	 */
 	protected function loadRadioGroup($field){
 
-		$field['required'] = $field['required'] == 'true' ? ' required' : false;
+		$field['required'] = $field['required'] == 'checked' ? ' required' : false;
 
 		$html = '';
 
-		$html .= sprintf('<li class="%s%s" id="fld-%s">' . "\n", $this->elemId($field['cssClass']), $field['required'], $this->elemId($field['title']));
+		$html .= sprintf('<li class="%s%s" id="fld-%s">' . "\n", $this->elemId($field['cssClass']), $field['required'], $field['code']);
 
 		if(isset($field['title']) && !empty($field['title'])){
 			$html .= sprintf('<span class="false_label">%s</span>' . "\n", $field['title']);
@@ -538,24 +545,26 @@ class Formbuilder {
 
 		if(isset($field['values']) && is_array($field['values'])){
 			$html .= sprintf('<span class="multi-row">') . "\n";
+			$i=0;
 			foreach($field['values'] as $item){
 
 				// set the default checked value
 				$checked = $item['default'] == 'true' ? true : false;
 
 				// load post value
-				$val = $this->getPostValue($this->elemId($field['title']));
+				$val = $this->getPostValue($field['code']);
 				$checked = !empty($val);
 
 				// if checked, set html
 				$checked = $checked ? ' checked="checked"' : '';
-
-				$radio 		= '<span class="row clearfix"><input type="radio" id="%s-%s" name="%1$s" value="%s"%s /><label for="%1$s-%2$s">%3$s</label></span>' . "\n";
+				
+				$radio 		= '<span class="row clearfix"><input type="radio" id="%s-'.$i.'" name="%1$s" value="%s"%s /><label for="%1$s-'.$i.'">%2$s</label></span>' . "\n";
 				$html .= sprintf($radio,
-										$this->elemId($field['title']),
-										$this->elemId($item['value']),
+										$field['code'],
 										$item['value'],
 										$checked);
+				
+				$i++;
 			}
 			$html .= sprintf('</span>') . "\n";
 		}
@@ -576,19 +585,19 @@ class Formbuilder {
 	 */
 	protected function loadSelectBox($field){
 
-		$field['required'] = $field['required'] == 'true' ? ' required' : false;
+		$field['required'] = $field['required'] == 'checked' ? ' required' : false;
 
 		$html = '';
 
-		$html .= sprintf('<li class="%s%s" id="fld-%s">' . "\n", $this->elemId($field['cssClass']), $field['required'], $this->elemId($field['title']));
+		$html .= sprintf('<li class="%s%s" id="fld-%s">' . "\n", $this->elemId($field['cssClass']), $field['required'], $field['code']);
 
 		if(isset($field['title']) && !empty($field['title'])){
-			$html .= sprintf('<label for="%s">%s</label>' . "\n", $this->elemId($field['title']), $field['title']);
+			$html .= sprintf('<label for="%s">%s</label>' . "\n", $field['code'], $field['title']);
 		}
 
 		if(isset($field['values']) && is_array($field['values'])){
 			$multiple = $field['multiple'] == "true" ? ' multiple="multiple"' : '';
-			$html .= sprintf('<select name="%s" id="%s"%s>' . "\n", $this->elemId($field['title']), $this->elemId($field['title']), $multiple);
+			$html .= sprintf('<select name="%s" id="%s"%s>' . "\n", $field['code'], $field['code'], $multiple);
 
 			foreach($field['values'] as $item){
 
@@ -596,7 +605,7 @@ class Formbuilder {
 				$checked = $item['default'] == 'true' ? true : false;
 
 				// load post value
-				$val = $this->getPostValue($this->elemId($field['title']));
+				$val = $this->getPostValue($field['code']);
 				$checked = !empty($val);
 
 				// if checked, set html
