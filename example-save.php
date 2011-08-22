@@ -18,7 +18,11 @@ $for_db = $form->store();
 // is also what's passed to the class when rendering
 // or editing the form.
 
-print_r($for_db);
+//print_r($for_db);
+
+$return_arr = array();
+$return_arr['error'] = 'Saving Error';
+echo json_encode($return_arr);
 
 /*
 Outputs:

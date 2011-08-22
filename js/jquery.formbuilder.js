@@ -15,6 +15,7 @@
 			control_box_target: false,
 			useJson: true, // XML as fallback
 			serialize_prefix: 'frmb',
+			code_prefix: 'options_',
 			use_ui_icon: false,
 			messages: {
 				save				: "Save",
@@ -221,7 +222,7 @@
 					field += '<label>' + opts.messages.comment + '</label>';
 					field += '<input class="fld-title" id="title-' + last_id + '" type="text" value="' + title + '" />';
 					help = '';
-					required = false;
+					required = 'disabled';
 					appendFieldLi(opts.messages.comment_field, field, required, help, code);
 				};
 			// single line input type="text"
@@ -381,7 +382,8 @@
 				};
 			// Appends the new field markup to the editor
 			var appendFieldLi = function (title, field_html, required, help, code) {
-					if (required) {
+					var reg = new RegExp(opts.code_prefix, "gi");
+					if (required != 'disabled') {
 						required = required === 'checked' ? true : false;
 					}
 					var disabled = '';
@@ -396,12 +398,12 @@
 					li += '<strong id="txt-title-' + last_id + '">' + title + '</strong></div>';
 					li += '<div id="frm-' + last_id + '-fld" class="frm-holder">';
 					li += '<div class="frm-elements">';
-					if (required) {
+					if (required != 'disabled') {
 						li += '<div class="frm-fld"><label for="required-' + last_id + '">' + opts.messages.required + '</label>';
 						li += '<input class="required" type="checkbox" value="1" name="required-' + last_id + '" id="required-' + last_id + '"' + (required ? ' checked="checked"' : '') + ' /></div>';
 					}
 					li += '<div class="frm-fld"><label>' + opts.messages.code + '</label>';
-					li += '<input type="text" name="code" value="' + code + '"' + disabled + ' /></div>';
+					li += '<input type="text" name="code" value="' + code.replace(reg, "") + '"' + disabled + ' /></div>';
 					li += field_html;
 					li += '</div>';
 					li += '</div>';
@@ -505,17 +507,26 @@
 			}
 			// saves the serialized data to the server 
 			var save = function () {
-					if (opts.save_url) {
-						$.ajax({
-							type: "POST",
-							url: opts.save_url,
-							data: $(ul_obj).serializeFormList({
-								prepend: opts.serialize_prefix
-							}),
-							success: function (xml) {}
-						});
-					}
-				};
+				if (opts.save_url) {
+					$.ajax({
+						type: "POST",
+						url: opts.save_url,
+						dataType: "json",
+						data: $(ul_obj).serializeFormList({
+							prepend: opts.serialize_prefix,
+							anchor: opts.code_prefix
+						}),
+						success: function (r) {
+							// TODO add external callback
+							if(r.error) {
+								$.jnotify(r.error, "error", true);
+							} else {
+								$.jnotify(r.status, 1000);
+							}
+						}
+					});
+				}
+			};
 		});
 	};
 })(jQuery);
@@ -532,6 +543,7 @@
 	$.fn.serializeFormList = function (options) {
 		// Extend the configuration options with user-provided
 		var defaults = {
+			anchor: 'options_',
 			prepend: 'ul',
 			is_child: false,
 			attributes: ['class']
@@ -557,7 +569,7 @@
 						case 'input_text':
 							$('#' + $(this).attr('id') + ' input[type=text]').each(function () {
 								if ($(this).attr('name') === 'code') {
-									serialStr += opts.prepend + '[' + li_count + '][code]=' + encodeURIComponent($(this).val());
+									serialStr += opts.prepend + '[' + li_count + '][code]=' + opts.anchor + encodeURIComponent($(this).val());
 								}
 								else {
 									serialStr += opts.prepend + '[' + li_count + '][values]=' + encodeURIComponent($(this).val());
@@ -567,7 +579,7 @@
 						case 'textarea':
 							$('#' + $(this).attr('id') + ' input[type=text]').each(function () {
 								if ($(this).attr('name') === 'code') {
-									serialStr += opts.prepend + '[' + li_count + '][code]=' + encodeURIComponent($(this).val());
+									serialStr += opts.prepend + '[' + li_count + '][code]=' + opts.anchor + encodeURIComponent($(this).val());
 								}
 								else {
 									serialStr += opts.prepend + '[' + li_count + '][values]=' + encodeURIComponent($(this).val());
@@ -581,7 +593,7 @@
 									serialStr += opts.prepend + '[' + li_count + '][title]=' + encodeURIComponent($(this).val());
 								}
 								else if ($(this).attr('name') === 'code') {
-									serialStr += opts.prepend + '[' + li_count + '][code]=' + encodeURIComponent($(this).val());
+									serialStr += opts.prepend + '[' + li_count + '][code]=' + opts.anchor + encodeURIComponent($(this).val());
 								}
 								else {
 									serialStr += opts.prepend + '[' + li_count + '][values][' + c + '][value]=' + encodeURIComponent($(this).val());
@@ -597,7 +609,7 @@
 									serialStr += opts.prepend + '[' + li_count + '][title]=' + encodeURIComponent($(this).val());
 								}
 								else if ($(this).attr('name') === 'code') {
-									serialStr += opts.prepend + '[' + li_count + '][code]=' + encodeURIComponent($(this).val());
+									serialStr += opts.prepend + '[' + li_count + '][code]=' + opts.anchor + encodeURIComponent($(this).val());
 								}
 								else {
 									serialStr += opts.prepend + '[' + li_count + '][values][' + c + '][value]=' + encodeURIComponent($(this).val());
@@ -614,7 +626,7 @@
 									serialStr += opts.prepend + '[' + li_count + '][title]=' + encodeURIComponent($(this).val());
 								}
 								else if ($(this).attr('name') === 'code') {
-									serialStr += opts.prepend + '[' + li_count + '][code]=' + encodeURIComponent($(this).val());
+									serialStr += opts.prepend + '[' + li_count + '][code]=' + opts.anchor + encodeURIComponent($(this).val());
 								}
 								else {
 									serialStr += opts.prepend + '[' + li_count + '][values][' + c + '][value]=' + encodeURIComponent($(this).val());
@@ -626,7 +638,7 @@
 						case 'comment':
 							$('#' + $(this).attr('id') + ' input[type=text]').each(function () {
 								if ($(this).attr('name') === 'code') {
-									serialStr += opts.prepend + '[' + li_count + '][code]=' + encodeURIComponent($(this).val());
+									serialStr += opts.prepend + '[' + li_count + '][code]=' + opts.anchor + encodeURIComponent($(this).val());
 								}
 								else {
 									serialStr += opts.prepend + '[' + li_count + '][values]=' + encodeURIComponent($(this).val());
