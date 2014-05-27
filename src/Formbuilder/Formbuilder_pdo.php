@@ -26,8 +26,7 @@
  * the jquery formbuilder plugin.
  * @package jquery.Formbuilder
  */
-class Formbuilder_pdo extends Formbuilder {
-	
+class Formbuilder_pdo extends Formbuilder 
 	/**
 	 * Contains PDO connection object
 	 * @var object 
