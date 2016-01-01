@@ -42,6 +42,7 @@ var Formrunner = function(opts){
   if( dust.onLoad === undefined ){
     dust.onLoad = function(name, callback) {
       $.ajax(_privateSelf._opts.templateBasePath + '/' + name + '.tpl', {
+        async:false,
         success: function(data) {
           callback(undefined, data);
         },
